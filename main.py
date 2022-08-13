@@ -1,8 +1,8 @@
 
- from fastapi import FastAPI
- app = FastAPI()
+from fastapi import FastAPI
+app = FastAPI()
 
- @app.get("/")
+@app.get("/")
 
- async def index():
-     return {"Message": "Computer Science"}
+async def index():
+    return {"Message": "Computer Science"}
