@@ -53,9 +53,9 @@ async def get_by_name(name:str):
     byname = db.query(models.Event).filter(models.Event.name==name).first()
     return byname
 
-@app.get('/get-event/{name}',response_model=Event,status_code=status.HTTP_200_OK)
-async def get_by_cat(name: str):
-    bycat = db.query(models.Event).filter(models.Event.category==name).first()
+@app.get('/get-event/{category}',response_model=Event,status_code=status.HTTP_200_OK)
+async def get_by_cat(category: str):
+    bycat = db.query(models.Event).filter(models.Event.category==category).first()
     return bycat
 
 @app.post('/get-event/',response_model=Event,status_code=status.HTTP_201_CREATED)
