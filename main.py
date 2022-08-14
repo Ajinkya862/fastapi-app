@@ -43,17 +43,17 @@ async def get_all_events():
 
     return events
 
-@app.get('/get-event/{name}')
+@app.get('/get-event/{name}',response_model=Event)
 async def get_by_name(name:str):
     byname = db.query(models.Event).filter(models.Event.name==name).first()
     return byname
 
-@app.get('/get-event/{category}')
-async def get_by_cat(category:str):
+@app.get('/get-event/{category}',response_model=Event)
+async def get_by_cat(category: str):
     bycat = db.query(models.Event).filter(models.Event.category==category).first()
     return bycat
 
-@app.post('/get-event',response_model=Event)
+@app.post('/get-event/',response_model=Event)
 async def create_event(event:Event):
     new_event = models.Event(
         name= event.name,
@@ -72,7 +72,7 @@ async def create_event(event:Event):
 
 @app.put('/get-event/{name}')
 async def update_event(name:str,event:Event):
-    event_to_update = db.query(models.Event).filter(models.Item.name==name).first()
+    event_to_update = db.query(models.Event).filter(models.Event.name==name).first()
     event_to_update.name = event.name,
     event_to_update.description = event.description,
     event_to_update.date = event.date,
