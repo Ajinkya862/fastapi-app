@@ -1,6 +1,6 @@
 
 from typing import List
-from fastapi import FastAPI
+from fastapi import FastAPI,status,HTTPException
 from database import SessionLocal, engine
 from pydantic import BaseModel
 import models
@@ -21,14 +21,15 @@ class Event(BaseModel):
     class Config:
         orm_mode=True
 
+db=SessionLocal()
 
-
-def get_db():
-    db=SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+#
+# def get_db():
+#     db=SessionLocal()
+#     try:
+#         yield db
+#     finally:
+#         db.close()
 
 
 # @app.on_event("startup")
@@ -41,23 +42,23 @@ def get_db():
 
 #To get event details
 
-@app.get('/get-event',response_model=List[Event])
+@app.get('/get-event',response_model=List[Event],status_code=200)
 async def get_all_events():
     events = db.query(models.Event).all()
 
     return events
 
-@app.get('/get-event/{name}',response_model=Event)
+@app.get('/get-event/{name}',response_model=Event,status_code=status.HTTP_200_OK)
 async def get_by_name(name:str):
     byname = db.query(models.Event).filter(models.Event.name==name).first()
     return byname
 
-@app.get('/get-event/{category}',response_model=Event)
+@app.get('/get-event/{category}',response_model=Event,status_code=status.HTTP_200_OK)
 async def get_by_cat(category: str):
     bycat = db.query(models.Event).filter(models.Event.category==category).first()
     return bycat
 
-@app.post('/get-event/',response_model=Event)
+@app.post('/get-event/',response_model=Event,status_code=status.HTTP_201_CREATED)
 async def create_event(event:Event):
     new_event = models.Event(
         name= event.name,
@@ -74,7 +75,7 @@ async def create_event(event:Event):
     return new_event
 
 
-@app.put('/get-event/{name}')
+@app.put('/get-event/{name}',response_model=Event,status_code=status.HTTP_200_OK)
 async def update_event(name:str,event:Event):
     event_to_update = db.query(models.Event).filter(models.Event.name==name).first()
     event_to_update.name = event.name,
