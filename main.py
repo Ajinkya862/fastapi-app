@@ -1,15 +1,11 @@
-import datetime
-import uuid
-from urllib import response
+
 from typing import List
 from fastapi import FastAPI
-import databases
-import sqlalchemy
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-from database import SessionLocal
+from database import SessionLocal, engine
 from pydantic import BaseModel
 import models
+models.Base.metadata.create_all(bind=engine)
+
 app = FastAPI()
 
 
@@ -25,7 +21,15 @@ class Event(BaseModel):
     class Config:
         orm_mode=True
 
-db=SessionLocal()
+
+
+def get_db():
+    db=SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 
 # @app.on_event("startup")
 # async def startup():
