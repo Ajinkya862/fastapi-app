@@ -4,6 +4,7 @@ from fastapi import FastAPI,status,HTTPException
 from database import SessionLocal, engine
 from pydantic import BaseModel
 import models
+
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
@@ -23,22 +24,6 @@ class Event(BaseModel):
 
 db=SessionLocal()
 
-#
-# def get_db():
-#     db=SessionLocal()
-#     try:
-#         yield db
-#     finally:
-#         db.close()
-
-
-# @app.on_event("startup")
-# async def startup():
-#     await database.connect()
-#
-# @app.on_event("shutdown")
-# async def shutdown():
-#     await database.disconnect()
 
 #To get event details
 
@@ -48,16 +33,25 @@ async def get_all_events():
 
     return events
 
+# To get events by name
 @app.get('/get-event/{name}',response_model=Event,status_code=status.HTTP_200_OK)
 async def get_by_name(name:str):
     byname = db.query(models.Event).filter(models.Event.name==name).first()
     return byname
 
-@app.get('/get-event/{category}',response_model=Event,status_code=status.HTTP_200_OK)
-async def get_by_cat(category: str):
-    bycat = db.query(models.Event).filter(models.Event.category==category).first()
+#To get events by location
+@app.get('/get-event/{name}/{location}',response_model=Event,status_code=status.HTTP_200_OK)
+async def get_by_location(location:str):
+    byplace = db.query(models.Event).filter(models.Event.location==location).first()
+    return byplace
+
+#To get events by category
+@app.get('/get-event/{name}/{location}/{category}',response_model=Event,status_code=status.HTTP_200_OK)
+async def get_by_category(category: str):
+    bycat = db.query(models.Event).filter(models.Event.category == category).first()
     return bycat
 
+#To create an event
 @app.post('/get-event/',response_model=Event,status_code=status.HTTP_201_CREATED)
 async def create_event(event:Event):
     new_event = models.Event(
@@ -74,7 +68,7 @@ async def create_event(event:Event):
 
     return new_event
 
-
+#To update an event
 @app.put('/get-event/{name}',response_model=Event,status_code=status.HTTP_200_OK)
 async def update_event(name:str,event:Event):
     event_to_update = db.query(models.Event).filter(models.Event.name==name).first()
@@ -88,6 +82,7 @@ async def update_event(name:str,event:Event):
     db.commit()
     return event_to_update
 
+#To delete an event
 @app.delete('/get-event/{name}')
 async def delete_event(name:str):
     delete_it = db.query(models.Event).filter(models.Event.name==name).first()
